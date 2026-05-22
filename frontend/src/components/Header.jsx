@@ -1,6 +1,7 @@
-import { Facebook, Heart } from "lucide-react";
+import { Facebook, Heart, ShieldCheck } from "lucide-react";
 import { LINKS } from "@/lib/constants";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -64,6 +65,15 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            aria-label="Volunteer Hub login"
+            data-testid="header-volunteer-hub-link"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-softink hover:text-flamingo-600 transition-colors px-3 py-2 rounded-full border border-line/70 hover:border-flamingo-300"
+          >
+            <ShieldCheck className="w-3.5 h-3.5" strokeWidth={1.5} />
+            Volunteer Hub
+          </Link>
           <a
             href={LINKS.facebook}
             target="_blank"

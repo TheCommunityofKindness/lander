@@ -1,6 +1,6 @@
 export const LINKS = {
   facebook: "https://www.facebook.com/share/1BJFTp15q6/",
-  gofundme: "https://www.gofundme.com/", // Placeholder — update with real campaign URL
+  gofundme: "https://gofund.me/842568097",
 };
 
 export const IMAGES = {

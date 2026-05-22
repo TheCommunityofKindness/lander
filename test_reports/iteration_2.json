@@ -1,0 +1,41 @@
+{
+  "summary": "Iteration 2 testing complete — JWT auth + Person Card CRM. Backend: 22/22 pytest cases pass (auth/login admin+volunteer+wrong-pw+unknown+case-insensitive, /auth/me with/without/invalid token, full consent gate enforcement on /api/cards for stability/notes/layer-2 public-consent, unauth 401 on POST + GET /cards, card create-list-get-patch CRUD, RBAC: volunteer cannot edit private layer of admin-created card → 403, volunteer CAN edit public layer of admin's card → 200, revoke clears public layer + drops layer to 0 + sets revoked_at + retains alias). Frontend: all critical flows verified — Volunteer Hub header link → /login; /crm protected redirect to /login; wrong password keeps user on /login; admin login redirects to /crm; CRM shows new-card button, search, trust filter, logout; New Person Card dialog opens; Next button DISABLED until both stability+notes consent are toggled (confirmed step-by-step: disabled with neither, disabled with stability-only, enabled with both); full new-card flow (toggle all 3 consents → alias → layer 2 → need=Food → trust=recognised → submit) creates card visible in list; clicking card opens CardDetail with toggle-private-btn working; revoke-consent-btn drops card to L0; sign-out clears auth and protected route correctly redirects to /login. Landing-page newsletter + volunteer forms still render. GoFundMe URL correctly updated to https://gofund.me/842568097 in /app/frontend/src/lib/constants.js.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "CardDetail (Private Layer → Trust level <select>)", "issues": ["React dev-mode hydration warning: 'In HTML, <span> cannot be a child of <option>'. The Emergent editor instrumentation injects a wrapping <span data-ve-dynamic> around {t.label} inside <option> in CardDetail.jsx line 248. Functional behaviour is fine and warning is dev-only (instrumentation is stripped in production builds), but it pollutes the console during E2E and could mask real warnings. Safe to ignore for now; if cleanup desired, replace <select>+<option> with a custom button group like NewCardDialog already uses for trust levels."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_auth_cards.py",
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional polish) After clicking 'Revoke consent' in CardDetail, also auto-close the detail modal — the modal currently stays open until the user clicks the backdrop/Escape, which can intercept subsequent header clicks (e.g. logout). Not a real bug; only matters for power-users doing back-to-back revoke→logout. Workaround in tests was to press Escape first.",
+    "(Optional polish) The trust-level <select> in CardDetail emits a dev-only React hydration warning because of the editor instrumentation spans inside <option>. Consider replacing with a custom button-group (matching NewCardDialog style) to silence the warning and keep visual consistency.",
+    "(Optional security hardening — not in scope of this iteration) Add rate-limit / lockout on /api/auth/login (currently unlimited attempts) and consider rotating JWT_SECRET out of the repo .env before any production deployment."
+  ],
+  "critical_code_review_comments": [
+    "server.py /api/auth/login is correctly bcrypt-verifying and emails are normalised to lowercase before lookup — verified case-insensitive login works.",
+    "_seed_user is idempotent AND updates password+name+role if the password no longer matches (good — supports rotating creds via .env without manual DB cleanup).",
+    "Consent gate logic is enforced server-side, not just client-side — POST /api/cards with stability_confirmed=false, notes_consent=false, or layer>=2 with public_card_consent=false all return 400 with clear detail messages. Excellent defence-in-depth.",
+    "RBAC on PATCH /cards/{id} private layer is enforced server-side (volunteer cannot edit admin's card's private fields → 403). Public layer remains editable by any operator — matches the documented protocol.",
+    "Revoke endpoint correctly clears public layer to defaults, sets layer=0, sets revoked_at, sets notes_consent + public_card_consent to False, AND retains alias — exactly as the Aionic Mirror protocol requires for re-engagement recognition.",
+    "JWT carries role in payload; get_current_user re-fetches user from DB so role changes are picked up on next request (good).",
+    "MongoDB _id is correctly excluded from all reads via projection {'_id': 0}.",
+    "Datetime round-trip via ISO strings works but is slightly fragile — _card_doc_to_out has to defensively coerce both str and datetime forms of consent.granted_at / created_at. Future query needs (e.g. 'cards created in last week') would benefit from storing native BSON datetimes instead.",
+    "GoFundMe URL correctly updated in constants.js to https://gofund.me/842568097.",
+    "data-testid coverage on CRM and dialog is excellent — every interactive element has a stable selector."
+  ],
+  "updated_files": ["/app/backend/tests/test_auth_cards.py"],
+  "success_rate": {"backend": "100% (22/22)", "frontend": "100% on critical flows (sign-out failure on first run was a CardDetail modal overlay artifact; reverified in isolation and works correctly)"},
+  "test_credentials": "Admin: freya@communityofkindness.org / kindness2026. Volunteer: volunteer@communityofkindness.org / walyalup2026. Both seeded automatically on backend startup from /app/backend/.env.",
+  "seed_data_creation": "Test created ~6 Person Cards with TEST_ / UI_Test_ alias prefixes in db.person_cards. One was revoked (layer=0). Did not clean up — they will not affect production but main agent may wish to seed-clean before launch.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend regression suite at /app/backend/tests/test_auth_cards.py (auth + cards, 22 tests) and /app/backend/tests/backend_test.py (landing-page subscribe/volunteer, iteration 1). Run: REACT_APP_BACKEND_URL=https://freya-walyulup.preview.emergentagent.com python -m pytest backend/tests/ -v. Note: iteration-1's backend_test.py has list_subscribers + list_volunteers GET tests that reference endpoints not in current server.py — those will fail if rerun on current code; deletion or implementation needed. For this iteration only the new test_auth_cards.py was executed (and passed). Frontend test_credentials in /app/memory/test_credentials.md is up to date.",
+  "rca of the issue": "No real bugs found. One transient test failure (sign-out after revoke) was an artifact of the CardDetail modal overlay still being open and intercepting the logout-button click. Reverified in isolation: logout works correctly, clears token, redirects /crm → /login. Mitigation: auto-close CardDetail after successful revoke (cosmetic improvement, not required)."
+}
