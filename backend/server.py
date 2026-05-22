@@ -179,6 +179,27 @@ class PersonCardOut(BaseModel):
     updated_at: datetime
 
 
+# --- Public stats / KPI feed ---
+class PublicStats(BaseModel):
+    fridays_served: int
+    meals_shared: int
+    volunteers: int
+    people_held: int
+    updated_at: datetime
+
+
+class StatsOverrideIn(BaseModel):
+    fridays_served: int = Field(..., ge=0, le=100000)
+    meals_shared: int = Field(..., ge=0, le=10000000)
+
+
+class StatsOverrideOut(BaseModel):
+    fridays_served: int
+    meals_shared: int
+    updated_at: datetime
+    updated_by: Optional[str] = None
+
+
 # ---------- Public Endpoints ----------
 @api_router.get("/")
 async def root():
@@ -381,6 +402,88 @@ async def revoke_consent(card_id: str, user: dict = Depends(require_operator)):
     )
     fresh = await db.person_cards.find_one({"id": card_id}, {"_id": 0})
     return _card_doc_to_out(fresh)
+
+
+# ---------- Public Stats / KPI Feed ----------
+DEFAULT_FRIDAYS_SERVED = 150
+DEFAULT_MEALS_SHARED = 3000
+
+
+async def _get_overrides() -> dict:
+    doc = await db.stats_overrides.find_one({"id": "singleton"}, {"_id": 0})
+    if not doc:
+        now = datetime.now(timezone.utc).isoformat()
+        doc = {
+            "id": "singleton",
+            "fridays_served": DEFAULT_FRIDAYS_SERVED,
+            "meals_shared": DEFAULT_MEALS_SHARED,
+            "updated_at": now,
+            "updated_by": None,
+        }
+        await db.stats_overrides.insert_one(doc.copy())
+    return doc
+
+
+@api_router.get("/stats/public", response_model=PublicStats)
+async def public_stats():
+    overrides = await _get_overrides()
+    volunteers_count = await db.volunteers.count_documents({})
+    # People held = active person cards (layer >= 1, consent not revoked)
+    people_held = await db.person_cards.count_documents(
+        {"layer": {"$gte": 1}, "consent.revoked_at": None}
+    )
+    updated_at = overrides["updated_at"]
+    if isinstance(updated_at, str):
+        updated_at = datetime.fromisoformat(updated_at)
+    return PublicStats(
+        fridays_served=int(overrides.get("fridays_served", DEFAULT_FRIDAYS_SERVED)),
+        meals_shared=int(overrides.get("meals_shared", DEFAULT_MEALS_SHARED)),
+        volunteers=volunteers_count,
+        people_held=people_held,
+        updated_at=updated_at,
+    )
+
+
+@api_router.get("/stats/admin", response_model=StatsOverrideOut)
+async def get_stats_overrides(user: dict = Depends(require_operator)):
+    doc = await _get_overrides()
+    updated_at = doc["updated_at"]
+    if isinstance(updated_at, str):
+        updated_at = datetime.fromisoformat(updated_at)
+    return StatsOverrideOut(
+        fridays_served=int(doc["fridays_served"]),
+        meals_shared=int(doc["meals_shared"]),
+        updated_at=updated_at,
+        updated_by=doc.get("updated_by"),
+    )
+
+
+@api_router.patch("/stats/admin", response_model=StatsOverrideOut)
+async def update_stats_overrides(
+    payload: StatsOverrideIn, user: dict = Depends(require_operator)
+):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    now = datetime.now(timezone.utc).isoformat()
+    await db.stats_overrides.update_one(
+        {"id": "singleton"},
+        {
+            "$set": {
+                "fridays_served": payload.fridays_served,
+                "meals_shared": payload.meals_shared,
+                "updated_at": now,
+                "updated_by": user["email"],
+            },
+            "$setOnInsert": {"id": "singleton"},
+        },
+        upsert=True,
+    )
+    return StatsOverrideOut(
+        fridays_served=payload.fridays_served,
+        meals_shared=payload.meals_shared,
+        updated_at=datetime.fromisoformat(now),
+        updated_by=user["email"],
+    )
 
 
 # ---------- App wiring ----------

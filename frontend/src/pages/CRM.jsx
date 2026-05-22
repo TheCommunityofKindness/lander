@@ -13,11 +13,13 @@ import {
   Sparkles,
   Users,
   Layers,
+  Gauge,
 } from "lucide-react";
 import { formatApiErrorDetail } from "@/context/AuthContext";
 import { TRUST_LEVELS, LAYER_LABELS } from "@/lib/crmConstants";
 import NewCardDialog from "@/components/crm/NewCardDialog";
 import CardDetail from "@/components/crm/CardDetail";
+import KPIEditor from "@/components/crm/KPIEditor";
 
 export default function CRM() {
   const { user, logout, authedAxios } = useAuth();
@@ -27,6 +29,7 @@ export default function CRM() {
   const [search, setSearch] = useState("");
   const [trustFilter, setTrustFilter] = useState("all");
   const [showNew, setShowNew] = useState(false);
+  const [showKPI, setShowKPI] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
   const fetchCards = async () => {
@@ -194,14 +197,26 @@ export default function CRM() {
               ))}
             </select>
           </div>
-          <button
-            onClick={() => setShowNew(true)}
-            data-testid="crm-new-card-btn"
-            className="btn-primary"
-          >
-            <Plus className="w-4 h-4" strokeWidth={2} />
-            New Person Card
-          </button>
+          <div className="flex flex-wrap gap-3 justify-end">
+            {user?.role === "admin" && (
+              <button
+                onClick={() => setShowKPI(true)}
+                data-testid="crm-kpi-btn"
+                className="btn-secondary"
+              >
+                <Gauge className="w-4 h-4" strokeWidth={1.75} />
+                Edit landing KPIs
+              </button>
+            )}
+            <button
+              onClick={() => setShowNew(true)}
+              data-testid="crm-new-card-btn"
+              className="btn-primary"
+            >
+              <Plus className="w-4 h-4" strokeWidth={2} />
+              New Person Card
+            </button>
+          </div>
         </section>
 
         {/* List */}
@@ -294,6 +309,8 @@ export default function CRM() {
           }}
         />
       )}
+
+      {showKPI && <KPIEditor onClose={() => setShowKPI(false)} />}
 
       {selectedId && (
         <CardDetail

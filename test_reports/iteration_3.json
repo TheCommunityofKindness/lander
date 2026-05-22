@@ -1,0 +1,43 @@
+{
+  "summary": "Iteration 3 — Live KPI data feed for landing-page Impact section. Backend: 12/12 pytest cases pass on the new /api/stats endpoints (public shape + auto-seed singleton, volunteers count reflects new volunteer creation, people_held increments when a Layer-1 card with consent is created and DECREASES by 1 after revoke, GET /stats/admin requires auth and accepts both admin+volunteer, PATCH /stats/admin admin-only with role=403 for volunteer, negative values blocked by Pydantic 422, post-PATCH values immediately reflected on /stats/public with updated_by set to admin email). Frontend: Impact section renders 4 tiles in correct order (Fridays served, Meals shared, Volunteers, People held) with count-up animation, skeleton pulse on load resolves to live values, 'live · last refreshed <date>' label visible (data-testid=stats-updated-at). CRM admin sees data-testid=crm-kpi-btn 'Edit landing KPIs', volunteer correctly does NOT see it. KPI editor opens, prefills current values from /stats/admin, save triggers PATCH + success toast 'KPIs published to the landing page', and landing page Impact section reflects the new numbers (verified: 182+ fridays / 3.5k+ meals after saving 182/3450).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_stats.py",
+    "/app/backend/tests/test_auth_cards.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py /api/stats/public correctly seeds singleton on first call (idempotent — repeat reads do not duplicate) and excludes _id via projection.",
+    "PATCH /api/stats/admin uses upsert with $setOnInsert id='singleton' — defensive against races where the singleton was deleted out-of-band. Good.",
+    "Pydantic StatsOverrideIn has ge=0/le=100000 and le=10000000 bounds — both ends covered, prevents accidental fat-finger overflow.",
+    "Role gate is double-enforced: require_operator dependency keeps non-operators out, then explicit `if user.role != 'admin'` raises 403 inside PATCH. The mirroring is fine but consider extracting a `require_admin` dependency for symmetry with require_operator.",
+    "people_held query `{layer: {$gte: 1}, 'consent.revoked_at': null}` is correct against the current revoke semantics (revoke sets layer=0 AND revoked_at=ISO string). Either condition would suffice today, but keeping both is defensive against future changes that may move only one.",
+    "Impact.jsx useCountUp hook is clean and cancellable; formatValue's `k+` rendering matches the prior static design — good visual continuity.",
+    "KPIEditor.jsx uses authedAxios from AuthContext so token refresh / 401 handling is consistent with the rest of the CRM — no new auth-leakage surface.",
+    "Minor: Impact.jsx swallows the actual error in axios catch (`catch {}`). Consider logging err to console for production debugging — currently a transient outage looks identical to a 500.",
+    "Minor: stats_overrides singleton stores `updated_at` as ISO string but seed path also writes ISO string — consistent, but could move to native BSON datetime to match a future analytics need (matches the same pattern flagged on person_cards last iteration).",
+    "Minor: server.py 552 lines — still under the 700-line guideline but trending up; consider splitting auth + cards + stats routers into separate modules when adding the next feature."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_stats.py"
+  ],
+  "success_rate": {
+    "backend": "100% (12/12 stats tests, after fixing test email TLD)",
+    "frontend": "100% on critical flows (landing live feed, RBAC button gating, KPI edit → save → propagation to landing)"
+  },
+  "test_credentials": "Admin: freya@communityofkindness.org / kindness2026. Volunteer: volunteer@communityofkindness.org / walyalup2026.",
+  "seed_data_creation": "Test created 1 throwaway volunteer (test_kpi_<hex>@example.com) and 2 throwaway Person Cards (alias prefix TEST_KPI_*) which were then revoked → harmless residue in db.volunteers and db.person_cards. PATCH /stats/admin was called multiple times; final published values on landing are fridays_served=182, meals_shared=3450. Main agent may wish to reset these to a desired 'launch number' before going live.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Stats regression suite at /app/backend/tests/test_stats.py covers all KPI endpoints incl. RBAC and derived counts. Combined with /app/backend/tests/test_auth_cards.py (22 tests) the backend now has 34 pytest cases. Run: REACT_APP_BACKEND_URL=https://freya-walyulup.preview.emergentagent.com python -m pytest backend/tests/test_stats.py backend/tests/test_auth_cards.py -v. Note: backend/tests/backend_test.py from iteration 1 still references non-existent GET /subscribers and GET /volunteers list endpoints and will fail if rerun on current server.py — either implement those list endpoints or drop those test functions. The KPI singleton is currently {fridays_served: 182, meals_shared: 3450, updated_by: freya@...}; reset via PATCH /api/stats/admin if you need to restore defaults (150/3000).",
+  "rca of the issue": "No bugs found in iteration 3. The single backend test failure during initial run was caused by my own test code using a `.local` TLD which Pydantic's EmailStr (email-validator) blocks as a reserved special-use TLD — switched to @example.com and the test passed. No code under review needed any changes."
+}
