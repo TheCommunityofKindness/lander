@@ -64,6 +64,7 @@ export default function CardDetail({ cardId, onClose, onUpdated }) {
       setPublicLayer(data.public);
       toast.success("Consent revoked. Public layer cleared.");
       onUpdated();
+      onClose();
     } catch (err) {
       toast.error(formatApiErrorDetail(err?.response?.data?.detail) || "Revoke failed.");
     } finally {
