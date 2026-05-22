@@ -1,0 +1,31 @@
+{
+  "summary": "Full E2E testing of Community of Kindness landing page. 14/14 backend pytest cases pass (health, subscribe valid/duplicate/case-insensitive/invalid/missing, list subscribers, volunteer create with/without note, invalid email, empty/missing name, list volunteers). Frontend renders all required sections (hero, acknowledgement, about Freya, Friday Lunchies, Impact, Gallery, How to Help, Footer). Volunteer form and newsletter form both submit successfully to backend, success and duplicate toasts both appear correctly. All external links (Facebook + GoFundMe) have correct hrefs and target=_blank. Hero headline matches 'Dignity, connection, and a place at the table.' No broken images, no failed resources, no JS errors except expected 409 from duplicate-test.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Newsletter invalid email", "issue": "Invalid email blocked by browser-native HTML5 validation popup ('Please include an @...') BEFORE the custom 'Please enter a valid email.' sonner toast can fire. User still gets a clear validation message, just not via custom toast. Low priority — the input is type=email so the browser intercepts. If you want the custom toast to fire, switch the input to type=text or add noValidate to the form.", "affected_selectors": ["[data-testid=\"newsletter-form\"]", "[data-testid=\"newsletter-email-input\"]"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "(Optional) Decide whether to keep browser-native validation popup or switch to the custom sonner toast for invalid email in the newsletter form. Current behavior is acceptable; just doesn't match the requested 'validation error toast'. Volunteer form has the same pattern (type=email) — also acceptable.",
+    "Replace GoFundMe placeholder URL (https://www.gofundme.com/) with the real campaign URL when available — flagged as acceptable per problem statement."
+  ],
+  "critical_code_review_comments": [
+    "server.py persists created_at as ISO string but the response model coerces back to datetime — works but inconsistent; consider storing as native BSON datetime for proper time-based queries later.",
+    "Subscribe endpoint normalizes to lowercase correctly; case-insensitive duplicate check verified.",
+    "No rate limiting on /api/subscribe or /api/volunteers — public unauthenticated endpoints could be spammed. Consider adding throttling or CAPTCHA before production launch.",
+    "Volunteer 'name' uses min_length=1 but not stripped before validation — empty-after-strip names like '   ' will pass Pydantic. Minor (current test happened to pass because empty string '' was rejected, but whitespace-only would slip through).",
+    "Frontend code is clean, uses REACT_APP_BACKEND_URL correctly, data-testid coverage is excellent."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100%", "frontend": "95% (1 minor toast-vs-native-validation observation)"},
+  "test_credentials": "None required",
+  "seed_data_creation": "Test subscribers and volunteers created via API with unique uuid-based emails (TEST_ prefix on volunteer name). Did not clean up — does not affect production data.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend tests at /app/backend/tests/backend_test.py cover all endpoints with 14 cases — reuse for regression. Newsletter/volunteer forms rely on browser-native email validation due to type=email; custom sonner toast for invalid email only fires if HTML5 check passes. All other flows working end-to-end.",
+  "rca of the issue": "Invalid-email toast 'Please enter a valid email.' did not appear in playwright test because input has type='email' and the browser blocks submit with a native popup before React's handleSubscribe ever runs. Reproduction: type 'not-an-email' into [data-testid=newsletter-email-input] and click submit — browser shows '@' tooltip. Mitigation (if desired): add noValidate prop to <form> or change input to type='text' and rely on regex check in handleSubscribe."
+}
