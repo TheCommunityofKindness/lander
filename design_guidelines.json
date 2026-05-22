@@ -1,0 +1,113 @@
+{
+  "project_name": "Community of Kindness Landing Page",
+  "theme": "light",
+  "archetype": "Archetype 1: Organic & Earthy (Modified for 'Polished Pink Flamingo' Editorial/Luxury vibe)",
+  "design_philosophy": "A highly polished, editorial, and dignified charity platform. Avoid kitsch and cartoonish motifs; instead, rely on fine-art textures (flamingo feathers), soft organic hues, and elegant serif typography. The vibe is luxurious compassion—dignified, welcoming, and rooted in the Australian coastal context of Fremantle/Walyalup.",
+  "colors": {
+    "background": {
+      "primary": "#FAF9F6",
+      "secondary": "#FDF8F6",
+      "tertiary": "#F2EFE9"
+    },
+    "text": {
+      "primary": "#2D2626",
+      "secondary": "#5C5353",
+      "accent": "#B85C5C"
+    },
+    "brand": {
+      "primary": "#E27A7A",
+      "primary_hover": "#C96565",
+      "accent_flamingo": "#F0A3A3",
+      "deep_plum": "#4A2A2A"
+    },
+    "surface": {
+      "card": "#FFFFFF",
+      "border": "#EADDDD"
+    }
+  },
+  "typography": {
+    "heading_font": "Cormorant Garamond",
+    "body_font": "Outfit",
+    "hierarchy": {
+      "h1": "text-5xl sm:text-6xl+ font-light tracking-tight leading-none",
+      "h2": "text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-deep_plum",
+      "h3": "text-xl sm:text-2xl font-medium tracking-tight",
+      "overline": "text-xs sm:text-sm uppercase tracking-[0.2em] font-semibold text-accent_flamingo",
+      "body": "text-base sm:text-lg leading-relaxed text-text-secondary"
+    }
+  },
+  "layout_and_spacing": {
+    "spacing_scale": "Generous spacing. Sections should use py-24 or py-32. Cards should use p-8 or p-12.",
+    "container": "max-w-7xl mx-auto px-6 md:px-12",
+    "bento_grid": "Use asymmetrical grid-cols-1 md:grid-cols-12 gap-8 for the Impact and 'What We Do' sections."
+  },
+  "components": {
+    "buttons": {
+      "primary": "rounded-full bg-brand-primary text-white px-8 py-4 font-medium transition-transform hover:-translate-y-1 hover:bg-brand-primary_hover hover:shadow-lg",
+      "secondary": "rounded-full border border-surface-border bg-transparent px-8 py-4 font-medium text-text-primary transition-all hover:border-brand-primary hover:text-brand-primary"
+    },
+    "cards": {
+      "style": "bg-surface-card rounded-3xl border border-surface-border/50 shadow-sm transition-all hover:shadow-md p-8 md:p-10"
+    },
+    "glassmorphism": {
+      "header": "backdrop-blur-xl bg-white/70 border-b border-white/40 shadow-sm"
+    }
+  },
+  "media": {
+    "images": {
+      "hero_background": {
+        "url": "https://static.prod-images.emergentagent.com/jobs/5beb28b8-bcce-40cb-8dad-27576fb2aa86/images/499de20a49bf2b4a8cb0e405aec6f0ded4f6f963d5089ef6fd95400b1ecc044e.png",
+        "description": "Abstract extreme close-up of a pink flamingo feather, soft natural lighting, elegant blush hues (AI Generated)",
+        "placement": "Hero section background (with warm white/blush gradient overlay bg-white/40 to ensure text legibility)"
+      },
+      "community_lunch": {
+        "url": "https://static.prod-images.emergentagent.com/jobs/5beb28b8-bcce-40cb-8dad-27576fb2aa86/images/19cd020e69809834c76c9e1198b6a42e268a8d1e110c456282fdff2c868f129b.png",
+        "description": "Polished editorial photograph of a long communal dining table set outdoors (AI Generated)",
+        "placement": "Friday Lunchies section or About section"
+      },
+      "fremantle_sunset": {
+        "url": "https://images.pexels.com/photos/1464870/pexels-photo-1464870.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Stunning sunset view with pathway and rocks along the coast in South Fremantle",
+        "placement": "Background for 'Acknowledgement of Country' or footer"
+      },
+      "food_gathering": {
+        "url": "https://images.unsplash.com/photo-1758275557250-894dd1e8feb3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxjb21tdW5pdHklMjBmb29kJTIwc2hhcmluZyUyMGdhdGhlcmluZyUyMG91dGRvb3JzfGVufDB8fHx8MTc3OTQxMjg3OHww&ixlib=rb-4.1.0&q=85",
+        "description": "Friends enjoying a picnic with guitar",
+        "placement": "Gallery or Community Voices section"
+      },
+      "flamingo_motif": {
+        "url": "https://images.unsplash.com/photo-1708721205486-dd5afb8cd39e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwcGluayUyMGZsYW1pbmdvJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzc5NDEyODc4fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Close up of pink flamingo feathers",
+        "placement": "Texture accent in sidebars or bento grid fillers"
+      }
+    },
+    "icons": {
+      "library": "lucide-react",
+      "style": "Use thin stroke-width (1.5) for an elegant, non-clunky appearance."
+    }
+  },
+  "page_structure": {
+    "1_header": "Sticky crystal glass nav. Left: 'Community of Kindness' elegant logotype. Right: Facebook Icon, 'Donate' CTA button.",
+    "2_hero": "Split layout or large overlay. Headline: 'Dignity, Connection, and a Place at the Table.' Subheadline mission statement. CTAs: 'Donate via GoFundMe' and 'Join us on Facebook'. Background: AI flamingo feather abstract with soft overlay.",
+    "3_acknowledgement": "Slim elegant banner or section: 'We acknowledge the Whadjuk Noongar people, traditional custodians of the Walyalup area...'",
+    "4_about_freya": "Editorial split section. Story of Freya Cheffers and the genesis of the Friday Lunchies. Use the community_lunch image here.",
+    "5_friday_lunchies": "Bento grid detailing what the initiative does for rough sleepers in Fremantle. High quality cards with generous padding.",
+    "6_impact": "Large serif numbers in a horizontal layout. (e.g. Meals Served, Community Members Reached).",
+    "7_gallery_testimonials": "Masonry gallery of community food sharing images paired with pull quotes in italic serif.",
+    "8_how_to_help": "3 columns: Volunteer, Donate (GoFundMe), Share (Facebook). Use soft card surfaces.",
+    "9_footer": "Deep plum or warm blush background. Newsletter signup ('Join our community'), external links, contact info."
+  },
+  "interactions_and_motion": {
+    "hover": "Subtle Y-axis translation (-translate-y-1) and elegant shadow scaling.",
+    "scroll": "Fade up and staggered entrance for bento grids and gallery images using framer-motion.",
+    "accessibility": "Ensure contrast on all text. All buttons must have data-testid attributes."
+  },
+  "instructions_to_main_agent": [
+    "Install required fonts from Google Fonts: Cormorant Garamond and Outfit.",
+    "Use pure HTML/Tailwind for marketing layout structures; avoid Shadcn generic cards if they constrain the bento grid or padding rules.",
+    "Do not use generic blue/indigo default colors. Strictly adhere to the blush/coral/plum palette.",
+    "Ensure 'GoFundMe' and 'Facebook' CTAs are highly visible and styled beautifully, not as generic tech buttons.",
+    "Link to Facebook: https://www.facebook.com/share/1BJFTp15q6/",
+    "Create a polished, editorial feel. Never use a literal vector cartoon flamingo. Rely on the abstract textures and colors to convey the theme."
+  ]
+}
