@@ -1,6 +1,8 @@
 export const LINKS = {
   facebook: "https://www.facebook.com/share/1BJFTp15q6/",
   gofundme: "https://gofund.me/842568097",
+  diamondSoulCentre: "#diamond-soul-centre", // TODO: replace with live URL
+  omnistruxTriad: "#omnistrux-triad", // TODO: replace with live URL
 };
 
 export const IMAGES = {

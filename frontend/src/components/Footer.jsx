@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Facebook, Mail, MapPin, ArrowRight } from "lucide-react";
+import { Facebook, Mail, MapPin, ArrowRight, ArrowUpRight, Gem, Network } from "lucide-react";
 import { LINKS } from "@/lib/constants";
 import { toast } from "sonner";
 import axios from "axios";
@@ -139,6 +139,66 @@ export default function Footer() {
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+
+        {/* Network strip */}
+        <div className="py-10 border-b border-flamingo-100/15" data-testid="network-strip">
+          <p className="overline text-flamingo-300 mb-5">Part of the network</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <a
+              href={LINKS.diamondSoulCentre}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="footer-diamond-soul-link"
+              className="group flex items-start gap-4 p-5 rounded-2xl border border-flamingo-100/15 bg-white/[0.03] hover:bg-white/[0.06] hover:border-flamingo-300/40 transition-all hover:-translate-y-0.5"
+            >
+              <span className="w-11 h-11 rounded-2xl bg-flamingo-300/15 flex items-center justify-center flex-shrink-0">
+                <Gem className="w-5 h-5 text-flamingo-200" strokeWidth={1.5} />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="flex items-center gap-2">
+                  <span className="font-serif-display text-xl text-flamingo-50 leading-tight">
+                    Diamond Soul Centre
+                  </span>
+                  <ArrowUpRight
+                    className="w-3.5 h-3.5 text-flamingo-200/80 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    strokeWidth={1.75}
+                  />
+                </span>
+                <span className="block text-xs text-flamingo-100/70 mt-1 leading-relaxed">
+                  Inner-work & somatic practice — the still point upstream of the
+                  table.
+                </span>
+              </span>
+            </a>
+
+            <a
+              href={LINKS.omnistruxTriad}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="footer-omnistrux-link"
+              className="group flex items-start gap-4 p-5 rounded-2xl border border-flamingo-100/15 bg-white/[0.03] hover:bg-white/[0.06] hover:border-flamingo-300/40 transition-all hover:-translate-y-0.5"
+            >
+              <span className="w-11 h-11 rounded-2xl bg-flamingo-300/15 flex items-center justify-center flex-shrink-0">
+                <Network className="w-5 h-5 text-flamingo-200" strokeWidth={1.5} />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="flex items-center gap-2">
+                  <span className="font-serif-display text-xl text-flamingo-50 leading-tight">
+                    Omnistrux Triad
+                  </span>
+                  <ArrowUpRight
+                    className="w-3.5 h-3.5 text-flamingo-200/80 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    strokeWidth={1.75}
+                  />
+                </span>
+                <span className="block text-xs text-flamingo-100/70 mt-1 leading-relaxed">
+                  The systemic platform — three-layer architecture for trust-based
+                  community work.
+                </span>
+              </span>
+            </a>
           </div>
         </div>
 
