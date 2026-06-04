@@ -194,7 +194,7 @@ export default function Footer() {
                   />
                 </span>
                 <span className="block text-xs text-flamingo-100/70 mt-1 leading-relaxed">
-                  The systemic platform — three-layer architecture for trust-based
+                  The wider platform — trust-based tools for grassroots
                   community work.
                 </span>
               </span>
