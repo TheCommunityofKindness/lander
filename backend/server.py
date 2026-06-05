@@ -334,7 +334,23 @@ async def create_card(payload: PersonCardIn, user: dict = Depends(require_operat
 
 @api_router.get("/cards", response_model=List[PersonCardOut])
 async def list_cards(user: dict = Depends(require_operator)):
-    cards = await db.person_cards.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    projection = {
+        "_id": 0,
+        "id": 1,
+        "alias": 1,
+        "layer": 1,
+        "consent": 1,
+        "public": 1,
+        "private": 1,
+        "created_by": 1,
+        "created_at": 1,
+        "updated_at": 1,
+    }
+    cards = (
+        await db.person_cards.find({}, projection)
+        .sort("created_at", -1)
+        .to_list(500)
+    )
     return [_card_doc_to_out(c) for c in cards]
 
 
